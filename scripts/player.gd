@@ -16,8 +16,6 @@ var gravity = 0
 
 var previously_floored = false
 
-var jump_single = true
-var jump_double = true
 
 var coins = 0
 
@@ -31,9 +29,8 @@ var coins = 0
 
 func _ready() -> void:
 	var initial_states = {
-		"idle_state" : IdleState.new(),
-		# "walk_state" : WalkState.new(),
-		"jump_state" : JumpState.new()
+		"jump_state" : JumpState.new(),
+		"idle_state" : IdleState.new()
 	}
 	movement_state_machine = AbilityStateMachine.new(self, initial_states)
 	add_child(movement_state_machine)
@@ -82,6 +79,10 @@ func _physics_process(delta):
 	
 	previously_floored = is_on_floor()
 
+	movement_state_machine.current_state.update(delta)
+
+func _input(event: InputEvent) -> void:
+	movement_state_machine.current_state.handle_input(event)
 # Handle animation(s)
 
 func handle_effects():
@@ -113,44 +114,15 @@ func handle_controls(delta):
 	input = input.rotated(Vector3.UP, view.rotation.y).normalized()
 	
 	movement_velocity = input * movement_speed * delta
+
 	
-	# Jumping
-	
-	if Input.is_action_just_pressed("jump"):
-		
-		if jump_single or jump_double:
-			Audio.play("res://sounds/jump.ogg")
-		
-		if jump_double:
-			
-			gravity = -jump_strength
-			
-			jump_double = false
-			model.scale = Vector3(0.5, 1.5, 0.5)
-			
-		if(jump_single): jump()
 
 # Handle gravity
 
 func handle_gravity(delta):
-	
 	gravity += 25 * delta
-	
-	if gravity > 0 and is_on_floor():
-		
-		jump_single = true
-		gravity = 0
 
-# Jumping
 
-func jump():
-	
-	gravity = -jump_strength
-	
-	model.scale = Vector3(0.5, 1.5, 0.5)
-	
-	jump_single = false;
-	jump_double = true;
 
 # Collecting coins
 
