@@ -21,7 +21,8 @@ func physics_process(delta: float) -> void:
 	if player.is_on_floor():
 		player.jump_single = true
 		player.gravity = 0
-		#TODO activate state machine in player to transition to exit this state
+		# activate state machine in player to transition to exit this state
+		player.state_machine.transition_to("IdleState")
 
 func handle_input(event: InputEvent) -> void:
 	if event.is_action_pressed("jump"):
